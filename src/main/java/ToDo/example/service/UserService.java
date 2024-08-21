@@ -81,7 +81,7 @@ public class UserService {
         return user;
     }
 
-    //비밀번호 재설정
+    //비밀번호 재설정 링크 이메일로 보내기
     public void sendPasswordResetLink(String email) {
         User user = userRepository.findByEmail(email);
 
@@ -92,6 +92,7 @@ public class UserService {
         }
     }
 
+    //비밀번호 재설정
     public void updatePassword(String email, String newPassword) {
         User user = userRepository.findByEmail(email);
 
