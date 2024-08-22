@@ -31,4 +31,15 @@ public class Task {
     private boolean isCompleted;
     private String notes;
 
+    public Task(String taskName, Category category, int frequency, String notes, User user) {
+        this.taskName = taskName;
+        this.category = category;
+        this.frequency = frequency;
+        this.isCompleted = false;
+        this.lastDate = LocalDateTime.now();
+        this.nextDate = this.lastDate.plusDays(frequency);
+        this.notes = notes;
+        this.user = user;
+    }
+
 }

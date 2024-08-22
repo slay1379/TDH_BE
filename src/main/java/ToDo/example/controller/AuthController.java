@@ -13,9 +13,5 @@ public class AuthController {
 
     private final UserService userService;
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
-        String token = userService.login(username, password);
-        return ResponseEntity.ok(token);
-    }
+
 }

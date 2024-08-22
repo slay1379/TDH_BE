@@ -11,11 +11,12 @@ public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int categoryId;
+    private Long categoryId;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
     private String categoryName;
     private String categoryColor;
 }
