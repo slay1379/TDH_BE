@@ -44,22 +44,28 @@ public class TaskController {
                                            @RequestParam String categoryName,
                                            @RequestParam int frequency,
                                            @RequestParam String notes,
-                                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate lastDate) {
+                                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate lastDate) {
         Task updatedTask = taskService.updateTask(taskId, taskName, categoryName, frequency, notes, lastDate);
         return ResponseEntity.ok(updatedTask);
     }
 
     //할 일 미루기
-    @PostMapping("/todosetting/{taskId}/delayCycle")
+    @PostMapping("/todomain/{taskId}/delayCycle")
     public ResponseEntity<Void> delayCycle(@PathVariable Long taskId) {
         taskService.delayCycle(taskId);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/todosetting/{taskId}/delayDay")
+    @PostMapping("/todomain/{taskId}/delayDay")
     public ResponseEntity<Void> delayDay(@PathVariable Long taskId) {
         taskService.delayDay(taskId);
         return ResponseEntity.ok().build();
     }
-    
+
+    //할 일 완료여부 바꾸기
+    @PostMapping("/todomain/{taskId}/changeCompleted")
+    public ResponseEntity<Void> changeCompleted(@PathVariable Long taskId) {
+        taskService.changeCompleted(taskId);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -64,7 +64,7 @@ public class Task {
         this.notes = newNotes;
     }
 
-    public void ChangeIsCompleted() {
+    public void changeCompleted() {
         if (this.isCompleted == false) {
             this.isCompleted = true;
         } else {

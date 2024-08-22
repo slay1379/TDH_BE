@@ -92,5 +92,14 @@ public class TaskService {
         task.updateLastDate(newLastDate);
     }
 
+    @Transactional
+    public void changeCompleted(Long taskId) {
+        Task task = taskRepository.findOne(taskId);
+        if (task == null) {
+            throw new IllegalStateException("유효하지 않는 할 일 입니다.");
+        }
+        task.changeCompleted();
+    }
+
 
 }
