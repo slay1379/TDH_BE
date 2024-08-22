@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,8 +27,8 @@ public class Task {
 
     private String taskName;
     private int frequency;
-    private LocalDateTime lastDate;
-    private LocalDateTime nextDate;
+    private LocalDate lastDate;
+    private LocalDate nextDate;
     private boolean isCompleted;
     private String notes;
 
@@ -36,10 +37,40 @@ public class Task {
         this.category = category;
         this.frequency = frequency;
         this.isCompleted = false;
-        this.lastDate = LocalDateTime.now();
+        this.lastDate = LocalDate.now();
         this.nextDate = this.lastDate.plusDays(frequency);
         this.notes = notes;
         this.user = user;
     }
+
+    public void updateTaskName(String newTaskName) {
+        this.taskName = newTaskName;
+    }
+
+    public void updateCategory(Category newCategory) {
+        this.category = newCategory;
+    }
+
+    public void updateFrequency(int newFrequency) {
+        this.frequency = newFrequency;
+        this.nextDate = this.lastDate.plusDays(newFrequency);
+    }
+
+    public void updateLastDate(LocalDate newLastDate) {
+        this.lastDate = newLastDate;
+    }
+
+    public void updateNotes(String newNotes) {
+        this.notes = newNotes;
+    }
+
+    public void ChangeIsCompleted() {
+        if (this.isCompleted == false) {
+            this.isCompleted = true;
+        } else {
+            this.isCompleted = false;
+        }
+    }
+
 
 }

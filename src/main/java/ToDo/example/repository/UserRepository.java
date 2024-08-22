@@ -14,7 +14,7 @@ public class UserRepository {
     private EntityManager em;
 
     public void save(User user) {
-        em.merge(user);
+        em.persist(user);
     }
 
     public User findOne(Long id) {

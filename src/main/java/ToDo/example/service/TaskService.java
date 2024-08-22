@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class TaskService {
@@ -24,16 +27,48 @@ public class TaskService {
     public Task createTask(String taskName, Long userId, String categoryName, int frequency, String notes) {
         User user = userRepository.findOne(userId);
         if (user == null) {
-            throw new IllegalStateException("유효하지 않은 ID입니다.");
+            throw new IllegalStateException("유효하지 않은 사용자 입니다.");
         }
 
         Category category = categoryRepository.findByName(categoryName);
         if (category == null) {
-            throw new IllegalStateException("유효하지 않은 카테고리ID 입니다.");
+            throw new IllegalStateException("유효하지 않은 카테고리 입니다.");
         }
 
         Task task = new Task(taskName, category, frequency, notes, user);
         taskRepository.save(task);
+        return task;
+    }
+
+    @Transactional
+    public Task updateTask(Long taskId, String taskName, String categoryName, int frequency, String notes, LocalDate lastDate) {
+
+        Task task = taskRepository.findOne(taskId);
+        if (task == null) {
+            throw new IllegalStateException("유효하지 않은 일입니다.");
+        }
+
+        if (taskName != null && !taskName.isEmpty() && !task.getTaskName().equals(taskName)){
+            task.updateTaskName(taskName);
+        }
+
+        if (categoryName != null && !categoryName.isEmpty() && !task.getCategory().getCategoryName().equals(categoryName)) {
+            Category category = categoryRepository.findByName(categoryName);
+            task.updateCategory(category);
+        }
+
+        if (frequency > 0 && task.getFrequency() != frequency) {
+            task.updateFrequency(frequency);
+        }
+
+        if (notes != null && !task.getNotes().equals(notes)) {
+            task.updateNotes(notes);
+        }
+
+        if (!task.getLastDate().equals(lastDate)) {
+            task.updateLastDate(lastDate);
+        }
+
         return task;
     }
 
