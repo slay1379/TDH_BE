@@ -72,7 +72,25 @@ public class TaskService {
         return task;
     }
 
+    @Transactional
+    public void delayCycle(Long taskId) {
+        Task task = taskRepository.findOne(taskId);
+        if (task == null) {
+            throw new IllegalStateException("유효하지 않는 할 일 입니다.");
+        }
+        LocalDate newLastDate = task.getLastDate().plusDays(task.getFrequency());
+        task.updateLastDate(newLastDate);
+    }
 
+    @Transactional
+    public void delayDay(Long taskId) {
+        Task task = taskRepository.findOne(taskId);
+        if (task == null) {
+            throw new IllegalStateException("유효하지 않는 할 일 입니다.");
+        }
+        LocalDate newLastDate = task.getLastDate().plusDays(1);
+        task.updateLastDate(newLastDate);
+    }
 
 
 }

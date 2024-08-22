@@ -49,4 +49,17 @@ public class TaskController {
         return ResponseEntity.ok(updatedTask);
     }
 
+    //할 일 미루기
+    @PostMapping("/todosetting/{taskId}/delayCycle")
+    public ResponseEntity<Void> delayCycle(@PathVariable Long taskId) {
+        taskService.delayCycle(taskId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/todosetting/{taskId}/delayDay")
+    public ResponseEntity<Void> delayDay(@PathVariable Long taskId) {
+        taskService.delayDay(taskId);
+        return ResponseEntity.ok().build();
+    }
+    
 }
