@@ -11,7 +11,5 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UserService userService;
-
 
 }

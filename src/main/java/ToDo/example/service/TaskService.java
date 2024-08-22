@@ -1,6 +1,5 @@
 package ToDo.example.service;
 
-import ToDo.example.DTO.TaskRequest;
 import ToDo.example.domain.Category;
 import ToDo.example.domain.Task;
 import ToDo.example.domain.User;
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -99,6 +98,11 @@ public class TaskService {
             throw new IllegalStateException("유효하지 않는 할 일 입니다.");
         }
         task.changeCompleted();
+    }
+
+    @Transactional
+    public List<Task> findTaskByLastDate(LocalDate lastDate) {
+        return taskRepository.findByLastDate(lastDate);
     }
 
 
