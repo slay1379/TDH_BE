@@ -18,4 +18,9 @@ public class Category {
     private User user;
 
     private String categoryName;
+
+    public Category(User user, String categoryName) {
+        this.user = user;
+        this.categoryName = categoryName;
+    }
 }
