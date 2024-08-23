@@ -1,19 +1,26 @@
 package ToDo.example.authentication;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 @Component
 public class JwtUtil {
-    private final String SECRET_KEY = System.getenv("SECRET_KEY");
-    private final String REFRESH_SECRET_KEY = System.getenv("REFRESH_SECRET_KEY");
+    private final String SECRET_KEY = Optional.ofNullable(System.getenv("SECRET_KEY"))
+            .orElseThrow(() -> new IllegalStateException("SECRET_KEY 환경 변수가 설정되지 않았습니다."));
+
+    private final String REFRESH_SECRET_KEY = Optional.ofNullable(System.getenv("REFRESH_SECRET_KEY"))
+            .orElseThrow(() -> new IllegalStateException("REFRESH_SECRET_KEY 환경 변수가 설정되지 않았습니다."));
+
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -24,7 +31,7 @@ public class JwtUtil {
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token, SECRET_KEY);
+        final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
@@ -58,11 +65,15 @@ public class JwtUtil {
     }
 
     public boolean isRefreshTokenExpired(String token) {
-        return extractAllClaims(token, REFRESH_SECRET_KEY).getExpiration().before(new Date());
+        return extractAllClaims(token).getExpiration().before(new Date());
     }
 
-    private Claims extractAllClaims(String token, String secretKey) {
-        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
+    private Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     public String extractRefreshUsername(String token) {
@@ -78,6 +89,34 @@ public class JwtUtil {
                 .getSubject();
     }
 
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(SECRET_KEY)
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (SignatureException e) {
+            System.err.println("유효하지 않은 서명입니다: " + e.getMessage());
+        } catch (ExpiredJwtException e) {
+            System.err.println("토큰이 만료되었습니다: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("토큰 유효성 검사 중 문제가 발생했습니다: " + e.getMessage());
+        }
+        return false;
+    }
 
+    public boolean validateRefreshToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(REFRESH_SECRET_KEY)
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Refresh 토큰 유효성 검사 중 문제가 발생했습니다: " + e.getMessage());
+            throw new SecurityException("Refresh JWT validation error");
+        }
+    }
 
 }
