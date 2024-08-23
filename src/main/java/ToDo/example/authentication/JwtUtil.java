@@ -5,6 +5,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.SignatureException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,8 @@ public class JwtUtil {
     private final String REFRESH_SECRET_KEY = Optional.ofNullable(System.getenv("REFRESH_SECRET_KEY"))
             .orElseThrow(() -> new IllegalStateException("REFRESH_SECRET_KEY 환경 변수가 설정되지 않았습니다."));
 
+    private static final String TOKEN_PREFIX = "Bearer ";
+    private static final String HEADER_STRING = "Authorization";
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -126,5 +129,17 @@ public class JwtUtil {
         return Arrays.stream(roles.split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
+    }
+
+    public String extractJwtFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader(HEADER_STRING);
+        if (bearerToken != null && bearerToken.startsWith(TOKEN_PREFIX)) {
+            return bearerToken.substring(TOKEN_PREFIX.length());
+        }
+        return null;
+    }
+
+    public Date getExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
     }
 }

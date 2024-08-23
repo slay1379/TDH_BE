@@ -69,14 +69,14 @@ public class UserController {
 
     //로그아웃
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request) {
-        String authoriztionHeader = request.getHeader("Authoriztion");
-
-        if (authoriztionHeader != null && authoriztionHeader.startsWith("Bearer ")) {
-            String jwt = authoriztionHeader.substring(7);
-            tokenBlacklistService.addToBlacklist(jwt);
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        String token = jwtUtil.extractJwtFromRequest(request);
+        if (token != null && jwtUtil.validateToken(token)) {
+            long expiration = jwtUtil.getExpiration(token).getTime();
+            tokenBlacklistService.addToBlacklist(token, expiration);
+            return ResponseEntity.ok("로그아웃되었습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
         }
-
-        return ResponseEntity.ok().build();
     }
 }
