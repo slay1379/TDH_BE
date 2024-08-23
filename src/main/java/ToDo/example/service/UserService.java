@@ -46,9 +46,6 @@ public class UserService {
         return token;
     }
 
-    //로그아웃
-
-
     //회원정보수정
     public User updateUser(Long userId, String newName, String newEmail, String newPassword, String token) {
         if (jwtUtil.isTokenExpired(token)) {

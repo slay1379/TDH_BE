@@ -3,6 +3,7 @@ package ToDo.example.controller;
 import ToDo.example.authentication.JwtUtil;
 import ToDo.example.domain.User;
 import ToDo.example.repository.UserRepository;
+import ToDo.example.service.TokenBlacklistService;
 import ToDo.example.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class UserController {
 
     private final UserService userService;
     private final JwtUtil jwtUtil;
+    private final TokenBlacklistService tokenBlacklistService;
 
     //로그인
     @PostMapping("/login")
@@ -63,5 +65,18 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("토큰이 만료되었거나 유효하지 않습니다.");
         }
+    }
+
+    //로그아웃
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
+        String authoriztionHeader = request.getHeader("Authoriztion");
+
+        if (authoriztionHeader != null && authoriztionHeader.startsWith("Bearer ")) {
+            String jwt = authoriztionHeader.substring(7);
+            tokenBlacklistService.addToBlacklist(jwt);
+        }
+
+        return ResponseEntity.ok().build();
     }
 }
