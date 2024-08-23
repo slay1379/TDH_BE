@@ -1,6 +1,7 @@
 package ToDo.example.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,9 @@ public class Task {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @NotBlank(message = "할 일을 입력해주세요.")
     private String taskName;
+
     private int frequency;
     private LocalDate lastDate;
     private LocalDate nextDate;

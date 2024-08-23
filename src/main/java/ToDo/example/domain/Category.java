@@ -1,6 +1,7 @@
 package ToDo.example.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,6 +18,7 @@ public class Category {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @NotBlank(message = "이름을 입력해주세요.")
     private String categoryName;
 
     public Category(User user, String categoryName) {
