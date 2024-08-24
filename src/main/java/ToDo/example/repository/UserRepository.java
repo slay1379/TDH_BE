@@ -1,51 +1,18 @@
 package ToDo.example.repository;
 
 import ToDo.example.domain.User;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import java.util.Optional;
 
-@Repository
-public class UserRepository {
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByUsername(String username);
 
-    @PersistenceContext
-    private EntityManager em;
+    Optional<User> findByEmail(String email);
 
-    public void save(User user) {
-        em.persist(user);
-    }
+    Optional<User> findById(Long userId);
 
-    public User findOne(Long id) {
-        return em.find(User.class, id);
-    }
+    boolean existsByEmail(String email);
 
-    public List<User> findAll() {
-        return em.createQuery(
-                "select u from User u", User.class)
-                .getResultList();
-    }
-
-    public User findByName(String username) {
-        try {
-            return em.createQuery(
-                            "select u from User u where u.username = :username", User.class)
-                    .setParameter("username", username)
-                    .getSingleResult();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public User findByEmail(String email) {
-        try {
-            return em.createQuery(
-                            "select u from User u where u.email = :email", User.class)
-                    .setParameter("email", email)
-                    .getSingleResult();
-        } catch (Exception e){
-            return null;
-        }
-    }
+    boolean existsByUsername(String username);
 }

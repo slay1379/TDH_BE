@@ -1,20 +1,18 @@
 package ToDo.example.controller;
 
+import ToDo.example.DTO.UserDto;
 import ToDo.example.authentication.JwtUtil;
 import ToDo.example.domain.User;
-import ToDo.example.repository.UserRepository;
 import ToDo.example.service.TokenBlacklistService;
 import ToDo.example.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -23,6 +21,15 @@ public class UserController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
     private final TokenBlacklistService tokenBlacklistService;
+
+    //회원가입
+
+    @PostMapping("/register")
+    public ResponseEntity<String> registerUser(@RequestBody @Valid UserDto userDTO) {
+        userService.join(userDTO);
+        return ResponseEntity.ok("회원가입이 완료되었습니다.");
+    }
+
 
     //로그인
     @PostMapping("/login")

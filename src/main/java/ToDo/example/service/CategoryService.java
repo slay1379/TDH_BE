@@ -3,8 +3,6 @@ package ToDo.example.service;
 import ToDo.example.authentication.JwtUtil;
 import ToDo.example.domain.Category;
 import ToDo.example.domain.User;
-import ToDo.example.repository.CategoryRepository;
-import ToDo.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,7 +1,6 @@
 package ToDo.example.controller;
 
 import ToDo.example.domain.Category;
-import ToDo.example.repository.CategoryRepository;
 import ToDo.example.service.CategoryService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

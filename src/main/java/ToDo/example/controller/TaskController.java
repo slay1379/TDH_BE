@@ -2,7 +2,6 @@ package ToDo.example.controller;
 
 import ToDo.example.domain.Task;
 import ToDo.example.domain.User;
-import ToDo.example.repository.UserRepository;
 import ToDo.example.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;

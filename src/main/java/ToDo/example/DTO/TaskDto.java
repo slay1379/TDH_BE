@@ -4,7 +4,7 @@ import ToDo.example.domain.Category;
 import lombok.Getter;
 
 @Getter
-public class TaskRequest {
+public class TaskDto {
     private String taskName;
     private Category category;
     private int frequency;
