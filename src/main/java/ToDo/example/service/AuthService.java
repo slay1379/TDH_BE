@@ -1,6 +1,7 @@
 package ToDo.example.service;
 
 import ToDo.example.DTO.UserDto;
+import ToDo.example.authentication.JwtUtil;
 import ToDo.example.domain.User;
 import ToDo.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @Transactional
     public void register(UserDto userDto) {
@@ -35,11 +37,15 @@ public class AuthService {
 
     }
 
-    public boolean login(UserDto userDto) {
+    public String login(UserDto userDto) {
         User user = userRepository.findByUsername(userDto.getUsername())
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 아이디입니다."));
 
-        return passwordEncoder.matches(userDto.getPassword(), user.getPassword());
+        if (!passwordEncoder.matches(userDto.getPassword(), user.getPassword())) {
+            throw new IllegalStateException("비밀번호가 틀립니다.");
+        }
+
+        return jwtUtil.generateAccessToken(user.getUsername());
     }
 
 }
