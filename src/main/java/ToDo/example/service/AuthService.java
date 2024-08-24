@@ -21,6 +21,10 @@ public class AuthService {
             throw new IllegalStateException("이미 존재하는 아이디입니다.");
         }
 
+        if (userDto.getPassword().equals(userDto.getComfirmPassword())) {
+            throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
+        }
+
         User user = User.builder()
                 .username(userDto.getUsername())
                 .password(passwordEncoder.encode(userDto.getPassword()))

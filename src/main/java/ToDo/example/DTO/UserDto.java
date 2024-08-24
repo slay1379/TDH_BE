@@ -19,7 +19,11 @@ public class UserDto {
     @Size(min = 6, message = "비밀번호는 6자 이상이어야 합니다.")
     private String password;
 
+    @NotBlank(message = "필수입력 입니다.")
+    private String comfirmPassword;
+
     @Email(message = "이메일은 필수입력 입니다.")
     @NotBlank(message = "이메일은 필수입력 입니다.")
     private String email;
+
 }
