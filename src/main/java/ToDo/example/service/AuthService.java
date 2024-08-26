@@ -17,6 +17,7 @@ public class AuthService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
+    //회원가입
     @Transactional
     public void register(UserDto userDto) {
         if (userRepository.existsByUsername(userDto.getUsername())) {
@@ -37,6 +38,7 @@ public class AuthService {
 
     }
 
+    //로그인
     public String login(UserDto userDto) {
         User user = userRepository.findByUsername(userDto.getUsername())
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 아이디입니다."));

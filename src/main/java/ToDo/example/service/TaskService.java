@@ -25,7 +25,7 @@ public class TaskService {
     //할 일 생성
     @Transactional
     public Task createTask(String taskName, Long userId, String categoryName, int frequency, String notes) {
-        Optional<User> optionalUser = userRepository.findById(userId);
+        Optional<User> optionalUser = userRepository.findByUserId(userId);
 
         User user = optionalUser.orElseThrow(() -> new IllegalStateException("유효하지 않은 사용자입니다."));
 
@@ -102,6 +102,11 @@ public class TaskService {
     @Transactional
     public List<Task> findTaskByLastDate(LocalDate lastDate) {
         return taskRepository.findByLastDate(lastDate);
+    }
+
+    @Transactional
+    public void deleteTask(Long taskId) {
+        taskRepository.deleteById(taskId);
     }
 
 

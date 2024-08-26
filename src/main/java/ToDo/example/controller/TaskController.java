@@ -11,10 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -56,6 +53,19 @@ public class TaskController {
         return ResponseEntity.ok(updatedTask);
     }
 
+    //할 일 삭제
+    @DeleteMapping("/todosetting/delete")
+    public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
+        try {
+            taskService.deleteTask(taskId);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
     //할 일 미루기
     @PostMapping("/todomain/{taskId}/delayCycle")
     @PreAuthorize("isAuthenticated()")
@@ -87,4 +97,6 @@ public class TaskController {
         List<Task> todayTasks = taskService.findTaskByLastDate(today);
         return ResponseEntity.ok(todayTasks);
     }
+
+
 }

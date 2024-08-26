@@ -7,6 +7,7 @@ import ToDo.example.repository.CategoryRepository;
 import ToDo.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -19,6 +20,7 @@ public class CategoryService {
     private final UserRepository userRepository;
 
     //카테고리 생성
+    @Transactional
     public Category createCategory(String token, String categoryname) {
         String username = jwtUtil.extractUsername(token);
         Optional<User> optionalUser = userRepository.findByUsername(username);
@@ -29,5 +31,13 @@ public class CategoryService {
         categoryRepository.save(category);
 
         return category;
+    }
+
+    @Transactional
+    public void deleteCategory(Long categoryId) {
+        if (!categoryRepository.existsByCategoryId(categoryId)) {
+            throw new IllegalStateException("존재하지 않는 카테고리입니다.");
+        }
+        categoryRepository.deleteById(categoryId);
     }
 }

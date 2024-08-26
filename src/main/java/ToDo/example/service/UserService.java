@@ -63,7 +63,7 @@ public class UserService {
         if (user != null) {
             String token = jwtUtil.generatePasswordResetToken(user.getEmail());
             String resetLink = "http:나의도메인.com/reset-password?token=" + token;
-    
+
         }
     }
 
