@@ -2,6 +2,7 @@ package ToDo.example.controller;
 
 import ToDo.example.domain.Task;
 import ToDo.example.domain.User;
+import ToDo.example.repository.UserRepository;
 import ToDo.example.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -35,9 +37,9 @@ public class TaskController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
-        User user = userRepository.findByName(username);
+        Optional<User> user = userRepository.findByUsername(username);
 
-        Task task = taskService.createTask(taskName, user.getUserId(), categoryName, frequency, notes);
+        Task task = taskService.createTask(taskName, user.get().getUserId(), categoryName, frequency, notes);
         return ResponseEntity.ok(task);
     }
 

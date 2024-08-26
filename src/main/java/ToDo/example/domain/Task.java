@@ -2,6 +2,7 @@ package ToDo.example.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class Task {
     private boolean isCompleted;
     private String notes;
 
+    @Builder
     public Task(String taskName, Category category, int frequency, String notes, User user) {
         this.taskName = taskName;
         this.category = category;
