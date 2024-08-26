@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +28,11 @@ public class UserService {
         }
 
         String tokenName = jwtUtil.extractUsername(token);
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다."));
+
+        Optional<User> optionalUser = userRepository.findByEmail(newEmail);
+
+        User user = optionalUser.orElseThrow(() -> new IllegalStateException("유효하지 않는 사용자입니다."));
+
 
         if (!user.getUsername().equals(tokenName)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
@@ -52,20 +56,22 @@ public class UserService {
 
     //비밀번호 재설정 링크 이메일로 보내기
     public void sendPasswordResetLink(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다."));
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        User user = optionalUser.orElseThrow(() -> new IllegalStateException("유효하지 않는 사용자입니다."));
 
         if (user != null) {
             String token = jwtUtil.generatePasswordResetToken(user.getEmail());
             String resetLink = "http:나의도메인.com/reset-password?token=" + token;
-
+    
         }
     }
 
     //비밀번호 재설정
     public void updatePassword(String email, String newPassword) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다."));
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        User user = optionalUser.orElseThrow(() -> new IllegalStateException("유효하지 않는 사용자입니다."));
 
         if (user != null) {
             user.updatePassword(new BCryptPasswordEncoder().encode(newPassword));
