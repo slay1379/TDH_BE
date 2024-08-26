@@ -1,5 +1,7 @@
 package ToDo.example.service;
 
+import ToDo.example.DTO.TaskDto;
+import ToDo.example.authentication.JwtUtil;
 import ToDo.example.domain.Category;
 import ToDo.example.domain.Task;
 import ToDo.example.domain.User;
@@ -21,50 +23,55 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final JwtUtil jwtUtil;
 
     //할 일 생성
     @Transactional
-    public Task createTask(String taskName, Long userId, String categoryName, int frequency, String notes) {
-        Optional<User> optionalUser = userRepository.findByUserId(userId);
+    public Task createTask(TaskDto taskDto, String token) {
+        if (jwtUtil.isTokenExpired(token)) {
+            throw new IllegalStateException("토큰이 만료되었습니다 다시 로그인 해주세요.");
+        }
+        String username = jwtUtil.extractUsername(token);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalStateException("유효하지 않은 사용자입니다."));
 
-        User user = optionalUser.orElseThrow(() -> new IllegalStateException("유효하지 않은 사용자입니다."));
+        Task task = Task.builder()
+                .taskName(taskDto.getTaskName())
+                .user(user)
+                .frequency(taskDto.getFrequency())
+                .category(taskDto.getCategory())
+                .notes(taskDto.getNotes())
+                .build();
 
-        Optional<Category> optionalCategory = categoryRepository.findByCategoryName(categoryName);
-
-        Category category = optionalCategory.orElseThrow(() -> new IllegalStateException("유효하지 않는 카테고리입니다."));
-
-        Task task = new Task(taskName, category, frequency, notes, user);
-        taskRepository.save(task);
-        return task;
+        return taskRepository.save(task);
     }
 
     @Transactional
-    public Task updateTask(Long taskId, String taskName, String categoryName, int frequency, String notes, LocalDate lastDate) {
+    public Task updateTask(Long taskId, TaskDto taskDto) {
 
-        Optional<Task> optionalTask = taskRepository.findByTaskId(taskId);
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 할 일 입니다."));
 
-        Task task = optionalTask.orElseThrow(() -> new IllegalStateException("유효하지 않은 할 일입니다."));
-
-        if (taskName != null && !taskName.isEmpty() && !task.getTaskName().equals(taskName)){
-            task.updateTaskName(taskName);
+        if (taskDto.getTaskName() != null && !task.getTaskName().equals(taskDto.getTaskName())){
+            task.updateTaskName(taskDto.getTaskName());
         }
 
-        if (categoryName != null && !categoryName.isEmpty() && !task.getCategory().getCategoryName().equals(categoryName)) {
-            Optional<Category> optionalCategory = categoryRepository.findByCategoryName(categoryName);
-            Category category = optionalCategory.orElseThrow(() -> new IllegalStateException("유효하지 않은 카테고리입니다."));
+        if (taskDto.getCategory().getCategoryName() != null && !taskDto.getCategory().getCategoryName().isEmpty() && !task.getCategory().getCategoryName().equals(taskDto.getCategory().getCategoryName())) {
+            Category category = categoryRepository.findByCategoryName(taskDto.getCategory().getCategoryName())
+                    .orElseThrow(() -> new IllegalStateException("존재하지 않는 카테고리입니다."));
             task.updateCategory(category);
         }
 
-        if (frequency > 0 && task.getFrequency() != frequency) {
-            task.updateFrequency(frequency);
+        if (taskDto.getFrequency() > 0 && task.getFrequency() != taskDto.getFrequency()) {
+            task.updateFrequency(taskDto.getFrequency());
         }
 
-        if (notes != null && !task.getNotes().equals(notes)) {
-            task.updateNotes(notes);
+        if (!task.getNotes().equals(taskDto.getNotes())) {
+            task.updateNotes(taskDto.getNotes());
         }
 
-        if (!task.getLastDate().equals(lastDate)) {
-            task.updateLastDate(lastDate);
+        if (!task.getLastDate().equals(taskDto.getLastDate())) {
+            task.updateLastDate(taskDto.getLastDate());
         }
 
         return task;
@@ -72,7 +79,7 @@ public class TaskService {
 
     @Transactional
     public void delayCycle(Long taskId) {
-        Optional<Task> optionalTask = taskRepository.findByTaskId(taskId);
+        Optional<Task> optionalTask = taskRepository.findById(taskId);
 
         Task task = optionalTask.orElseThrow(() -> new IllegalStateException("유효하지 않은 할 일입니다."));
 

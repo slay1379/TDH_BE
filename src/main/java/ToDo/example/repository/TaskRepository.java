@@ -10,13 +10,7 @@ import java.util.Optional;
 
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
-    Optional<Task> findByTaskId(Long taskId);
-
     Optional<Task> findByTaskName(String taskName);
-
-    void deleteById(Long taskId);
-
-    List<Task> findAll(Sort sort);
 
     List<Task> findByUserId(Long userId);
 

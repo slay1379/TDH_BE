@@ -1,9 +1,11 @@
 package ToDo.example.controller;
 
+import ToDo.example.DTO.TaskDto;
 import ToDo.example.domain.Task;
 import ToDo.example.domain.User;
 import ToDo.example.repository.UserRepository;
 import ToDo.example.service.TaskService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -27,16 +30,10 @@ public class TaskController {
     //할 일 생성
     @PostMapping("/todosetting")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Task> createTask(@RequestParam String taskName,
-                                           @RequestParam String categoryName,
-                                           @RequestParam int frequency,
-                                           @RequestParam String notes) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+    public ResponseEntity<Task> createTask(@Validated(TaskDto.Create.class) @RequestBody TaskDto taskDto,
+                                           @RequestHeader("Authorization") String token) {
 
-        Optional<User> user = userRepository.findByUsername(username);
-
-        Task task = taskService.createTask(taskName, user.get().getUserId(), categoryName, frequency, notes);
+        Task task = taskService.createTask(taskDto, token);
         return ResponseEntity.ok(task);
     }
 
@@ -44,12 +41,9 @@ public class TaskController {
     @PostMapping("/todosetting/{taskid}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Task> updateTask(@PathVariable Long taskId,
-                                           @RequestParam String taskName,
-                                           @RequestParam String categoryName,
-                                           @RequestParam int frequency,
-                                           @RequestParam String notes,
-                                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate lastDate) {
-        Task updatedTask = taskService.updateTask(taskId, taskName, categoryName, frequency, notes, lastDate);
+                                           @Validated(TaskDto.Update.class) @RequestBody TaskDto taskDto) {
+
+        Task updatedTask = taskService.updateTask(taskId, taskDto);
         return ResponseEntity.ok(updatedTask);
     }
 

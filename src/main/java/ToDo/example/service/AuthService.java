@@ -9,6 +9,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -40,8 +42,9 @@ public class AuthService {
 
     //로그인
     public String login(UserDto userDto) {
-        User user = userRepository.findByUsername(userDto.getUsername())
-                .orElseThrow(() -> new IllegalStateException("존재하지 않는 아이디입니다."));
+        Optional<User> optionalUser = userRepository.findByUsername(userDto.getUsername());
+
+        User user = optionalUser.orElseThrow(() -> new IllegalStateException("존재하지 않는 아이디입니다."));
 
         if (!passwordEncoder.matches(userDto.getPassword(), user.getPassword())) {
             throw new IllegalStateException("비밀번호가 틀립니다.");
