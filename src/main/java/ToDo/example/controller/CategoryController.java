@@ -31,7 +31,7 @@ public class CategoryController {
     }
 
     //카테고리 삭제
-    @DeleteMapping("/todosetting/deleteCategory")
+    @DeleteMapping("/todosetting/{catgoryId}/deleteCategory")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
         try {
             categoryService.deleteCategory(categoryId);

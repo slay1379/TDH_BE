@@ -54,7 +54,7 @@ public class TaskController {
     }
 
     //할 일 삭제
-    @DeleteMapping("/todosetting/delete")
+    @DeleteMapping("/todosetting/{taskId}/delete")
     public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
         try {
             taskService.deleteTask(taskId);
