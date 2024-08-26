@@ -22,22 +22,6 @@ public class UserController {
     private final JwtUtil jwtUtil;
     private final TokenBlacklistService tokenBlacklistService;
 
-    //회원가입
-
-    @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody @Valid UserDto userDTO) {
-        userService.join(userDTO);
-        return ResponseEntity.ok("회원가입이 완료되었습니다.");
-    }
-
-
-    //로그인
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
-        String token = userService.login(username, password);
-        return ResponseEntity.ok(token);
-    }
-
     //회원정보 수정
     @PutMapping("/update/{id}")
     @PreAuthorize("isAuthenticated()")

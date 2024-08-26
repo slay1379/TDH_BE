@@ -21,4 +21,10 @@ public class AuthController {
         authService.register(userDto);
         return ResponseEntity.ok("회원가입에 성공했습니다.");
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@Valid @RequestBody UserDto userDto) {
+        String token = authService.login(userDto);
+        return ResponseEntity.ok(token);
+    }
 }

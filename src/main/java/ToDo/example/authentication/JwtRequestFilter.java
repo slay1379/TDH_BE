@@ -37,7 +37,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             jwt = authorizationHeader.substring(7);
 
             // 블랙리스트에 있는 토큰인지 확인
-            if (tokenBlacklistService.isBlacklisted(jwt)) {
+            if (jwt != null && tokenBlacklistService.isBlacklisted(jwt)) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "토큰이 블랙리스트에 포함되었습니다.");
                 return;
             }
