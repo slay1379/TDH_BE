@@ -1,5 +1,6 @@
 package ToDo.example.domain;
 
+import ToDo.example.DTO.UserDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,6 +11,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 
@@ -23,9 +26,7 @@ public class User {
     private Long userId;
 
     private String username;
-
     private String email;
-
     private String password;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -39,13 +40,16 @@ public class User {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void updateUserName(String newUsername) {
-        this.username = newUsername;
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public void updateEmail(String newEmail) {
-        this.email = newEmail;
+    public void update(UserDto userDto, BCryptPasswordEncoder passwordEncoder) {
+        if (userDto.getUsername() != null) {
+            this.username = userDto.getUsername();
+        }
+        if (userDto.getEmail() != null) {
+            this.email = userDto.getEmail();
+        }
+        if (userDto.getPassword() != null) {
+            this.password = passwordEncoder.encode(userDto.getPassword());
+        }
         this.updatedAt = LocalDateTime.now();
     }
 

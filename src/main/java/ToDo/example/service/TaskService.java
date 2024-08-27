@@ -9,6 +9,7 @@ import ToDo.example.repository.CategoryRepository;
 import ToDo.example.repository.TaskRepository;
 import ToDo.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class TaskService {
 
     private final TaskRepository taskRepository;
@@ -26,14 +28,13 @@ public class TaskService {
     private final JwtUtil jwtUtil;
 
     //할 일 생성
-    @Transactional
     public Task createTask(TaskDto taskDto, String token) {
         if (jwtUtil.isTokenExpired(token)) {
             throw new IllegalStateException("토큰이 만료되었습니다 다시 로그인 해주세요.");
         }
         String username = jwtUtil.extractUsername(token);
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalStateException("유효하지 않은 사용자입니다."));
+                .orElseThrow(() -> new UsernameNotFoundException("유효하지 않은 사용자입니다."));
 
         Task task = Task.builder()
                 .taskName(taskDto.getTaskName())
@@ -46,7 +47,6 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    @Transactional
     public Task updateTask(Long taskId, TaskDto taskDto) {
 
         Task task = taskRepository.findById(taskId)
@@ -77,21 +77,15 @@ public class TaskService {
         return task;
     }
 
-    @Transactional
     public void delayCycle(Long taskId) {
-        Optional<Task> optionalTask = taskRepository.findById(taskId);
-
-        Task task = optionalTask.orElseThrow(() -> new IllegalStateException("유효하지 않은 할 일입니다."));
+        Task task = getTaskById(taskId);
 
         LocalDate newLastDate = task.getLastDate().plusDays(task.getFrequency());
         task.updateLastDate(newLastDate);
     }
 
-    @Transactional
     public void delayDay(Long taskId) {
-        Optional<Task> optionalTask = taskRepository.findById(taskId);
-
-        Task task = optionalTask.orElseThrow(() -> new IllegalStateException("유효하지 않은 할 일입니다."));
+        Task task = getTaskById(taskId);
 
         LocalDate newLastDate = task.getLastDate().plusDays(1);
         task.updateLastDate(newLastDate);
@@ -99,9 +93,7 @@ public class TaskService {
 
     @Transactional
     public void changeCompleted(Long taskId) {
-        Optional<Task> optionalTask = taskRepository.findById(taskId);
-
-        Task task = optionalTask.orElseThrow(() -> new IllegalStateException("유효하지 않은 할 일입니다."));
+        Task task = getTaskById(taskId);
 
         task.changeCompleted();
     }
@@ -114,6 +106,11 @@ public class TaskService {
     @Transactional
     public void deleteTask(Long taskId) {
         taskRepository.deleteById(taskId);
+    }
+
+    private Task getTaskById(Long taskId) {
+        return taskRepository.findById(taskId)
+                .orElseThrow(() -> new IllegalStateException("유효하지 않은 할 일입니다."));
     }
 
 

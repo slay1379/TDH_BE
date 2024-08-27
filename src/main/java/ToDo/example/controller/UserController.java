@@ -48,26 +48,13 @@ public class UserController {
     //비밀번호 재설정
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
-        String email = jwtUtil.extractEmailFromToken(token);
+        String email = jwtUtil.extractEmail(token);
 
         if (email != null && !jwtUtil.isTokenExpired(token)) {
-            userService.updatePassword(email, newPassword);
+            userService.resetPassword(email, newPassword);
             return ResponseEntity.ok("비밀번호가 재설정되었습니다.");
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("토큰이 만료되었거나 유효하지 않습니다.");
-        }
-    }
-
-    //로그아웃
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request) {
-        String token = jwtUtil.extractJwtFromRequest(request);
-        if (token != null && jwtUtil.validateToken(token)) {
-            long expiration = jwtUtil.getExpiration(token).getTime();
-            tokenBlacklistService.addToBlacklist(token, expiration);
-            return ResponseEntity.ok("로그아웃되었습니다.");
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
         }
     }
 }

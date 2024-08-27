@@ -21,8 +21,13 @@ public class JwtUtil {
 
     @Value("${jwt.refresh.secret.key}")
     private String REFRESH_SECRET_KEY;
+
+    @Value("${jwt.password.secret.key}")
+    private String PASSWORD_RESET_SECRET_KEY;
+
     private final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 60; //1시간
     private final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24 * 7; //1주일
+    private final long PASSWORD_RESET_EXPIRATION_TIME = 1000 * 60 * 5; //5분
 
 
     public String generateAccessToken(String username) {
@@ -31,6 +36,10 @@ public class JwtUtil {
 
     public String generateRefreshToken(String username) {
         return createToken(new HashMap<>(), username, REFRESH_SECRET_KEY, REFRESH_TOKEN_VALIDITY); //1주 유효
+    }
+
+    public String generatePasswordResetToken(String email) {
+        return createToken(new HashMap<>(), email, PASSWORD_RESET_SECRET_KEY, PASSWORD_RESET_EXPIRATION_TIME);
     }
 
     private String createToken(Map<String, Object> claims, String subject, String secret, long expiration) {
@@ -76,6 +85,10 @@ public class JwtUtil {
 
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
+    }
+
+    public String extractEmail(String token) {
+        return extractClaim(token, Claims::getSubject);
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {

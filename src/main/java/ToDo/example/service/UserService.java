@@ -4,7 +4,9 @@ import ToDo.example.DTO.UserDto;
 import ToDo.example.authentication.JwtUtil;
 import ToDo.example.domain.User;
 import ToDo.example.repository.UserRepository;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,66 +19,52 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final EmailService emailService;
 
 
     //회원정보수정
-    public User updateUser(Long userId, String newName, String newEmail, String newPassword, String token) {
+    public User updateUser(UserDto userDto, String token) {
         if (jwtUtil.isTokenExpired(token)) {
             throw new IllegalStateException("토큰이 만료되었습니다. 다시 로그인 해주세요.");
         }
 
-        String tokenName = jwtUtil.extractUsername(token);
+        String username = jwtUtil.extractUsername(token);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("유효하지 않은 사용자입니다."));
 
-        Optional<User> optionalUser = userRepository.findByEmail(newEmail);
-
-        User user = optionalUser.orElseThrow(() -> new IllegalStateException("유효하지 않는 사용자입니다."));
-
-
-        if (!user.getUsername().equals(tokenName)) {
-            throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
-        }
-
-        if (newName != null && !newName.isEmpty() && !newName.equals(user.getUsername())) {
-            user.updateUserName(newName);
-        }
-
-        if (newEmail != null && !newEmail.isEmpty() && !newEmail.equals(user.getEmail())) {
-            user.updateEmail(newEmail);
-        }
-
-        if (newPassword != null && !newPassword.isEmpty()) {
-            String encodePassword = passwordEncoder.encode(newPassword);
-            user.updatePassword(encodePassword);
-        }
-
+        user.update(userDto, passwordEncoder);
         return user;
     }
 
     //비밀번호 재설정 링크 이메일로 보내기
     public void sendPasswordResetLink(String email) {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("유효하지 않은 사용자입니다."));
 
-        User user = optionalUser.orElseThrow(() -> new IllegalStateException("유효하지 않는 사용자입니다."));
+        String token = jwtUtil.generatePasswordResetToken(user.getEmail());
+        String resetLink = "http://나의도메인.com/reset-password?token=" + token;
 
-        if (user != null) {
-            String token = jwtUtil.generatePasswordResetToken(user.getEmail());
-            String resetLink = "http:나의도메인.com/reset-password?token=" + token;
-
+        try {
+            emailService.sendPasswordResetEmail(user.getEmail(), resetLink);
+        } catch (MessagingException e) {
+            throw new IllegalStateException("이메일 전송에 실패하였습니다.", e);
         }
     }
 
     //비밀번호 재설정
-    public void updatePassword(String email, String newPassword) {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-
-        User user = optionalUser.orElseThrow(() -> new IllegalStateException("유효하지 않는 사용자입니다."));
-
-        if (user != null) {
-            user.updatePassword(new BCryptPasswordEncoder().encode(newPassword));
-            userRepository.save(user);
+    public void resetPassword(String token, String newPassword) {
+        if (jwtUtil.isTokenExpired(token)) {
+            throw new IllegalStateException("비밀번호 재설정 토큰이 만료되었습니다.");
         }
+
+        String email = jwtUtil.extractEmail(token);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("유효하지 않은 사용자입니다."));
+
+        user.updatePassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 
 }
