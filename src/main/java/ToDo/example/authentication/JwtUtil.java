@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -39,7 +40,16 @@ public class JwtUtil {
     }
 
     public String generateAccessToken(String username) {
-        return createToken(new HashMap<>(), username, SECRET_KEY, 1000 * 60 * 60); // 1-hour expiration
+        return createToken(new HashMap<>(), username, SECRET_KEY, 1000 * 60 * 60); // 1시간 expiration
+    }
+
+    public String generateRefreshToken(UserDetails userDetails) {
+        return Jwts.builder()
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 14)) // 2주 expiration
+                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+                .compact();
     }
 
     public String generatePasswordResetToken(String email) {
@@ -64,6 +74,9 @@ public class JwtUtil {
     }
 
     public boolean isTokenExpired(String token) {
+        try{
+
+        }
         return extractExpiration(token).before(new Date());
     }
 
