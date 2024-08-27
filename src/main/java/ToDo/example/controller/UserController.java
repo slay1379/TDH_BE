@@ -23,19 +23,19 @@ public class UserController {
     private final TokenBlacklistService tokenBlacklistService;
 
     //회원정보 수정
-    @PutMapping("/update/{id}")
+    @PutMapping("/update")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<User> updateUser(
-            @PathVariable Long id,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String password,
-            HttpServletRequest request) {
+    public ResponseEntity<String> updateUser(
+            @RequestHeader("Authorization") String token,
+            @Valid @RequestBody UserDto userDto) {
 
-        String token = request.getHeader("Authorization").substring(7);
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
 
-        User updateUser = userService.updateUser(id, name, email, password, token);
-        return ResponseEntity.ok(updateUser);
+        userService.updateUser(userDto, token);
+
+        return ResponseEntity.ok("회원 정보가 성공적으로 업데이트되었습니다.");
     }
 
     //비밀번호 잃어버림

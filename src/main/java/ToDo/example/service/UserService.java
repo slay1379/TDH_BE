@@ -10,12 +10,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
 
     private final UserRepository userRepository;
@@ -25,7 +27,7 @@ public class UserService {
 
 
     //회원정보수정
-    public User updateUser(UserDto userDto, String token) {
+    public void updateUser(UserDto userDto, String token) {
         if (jwtUtil.isTokenExpired(token)) {
             throw new IllegalStateException("토큰이 만료되었습니다. 다시 로그인 해주세요.");
         }
@@ -35,7 +37,6 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("유효하지 않은 사용자입니다."));
 
         user.update(userDto, passwordEncoder);
-        return user;
     }
 
     //비밀번호 재설정 링크 이메일로 보내기
