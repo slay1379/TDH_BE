@@ -3,8 +3,11 @@ package ToDo.example.controller;
 import ToDo.example.DTO.UserDto;
 import ToDo.example.authentication.JwtUtil;
 import ToDo.example.service.AuthService;
+import ToDo.example.service.TokenBlacklistService;
 import ToDo.example.service.UserService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,25 +21,58 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtUtil jwtUtil;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@Valid @RequestBody UserDto userDto) {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody UserDto userDto) {
         authService.register(userDto);
-        return ResponseEntity.ok("회원가입에 성공했습니다.");
+        return ResponseEntity.ok(new AuthResponse("회원가입에 성공했습니다."));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody UserDto userDto) {
-        String token = authService.login(userDto);
-        return ResponseEntity.ok(token);
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody UserDto userDto) {
+        String accessToken = authService.login(userDto);
+        String refreshToken = jwtUtil.generateRefreshToken(userDto.getUsername());
+        return ResponseEntity.ok(new AuthResponse(accessToken, refreshToken));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String refreshToken) {
-        if (jwtUtil.isTokenExpired(refreshToken)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh 토큰이 만료되었습니다.");
+    public ResponseEntity<AuthResponse> refreshToken(@RequestHeader("Authorization") String refreshToken) {
+        if (refreshToken != null && refreshToken.startsWith("Bearer ")) {
+            refreshToken = refreshToken.substring(7);
         }
-        String token = jwtUtil.generateAccessToken(jwtUtil.extractUsername(refreshToken));
-        return ResponseEntity.ok(token);
+        if (jwtUtil.validateToken(refreshToken)) {
+            String username = jwtUtil.extractUsername(refreshToken);
+            String newAccessToken = jwtUtil.generateAccessToken(username);
+            return ResponseEntity.ok(new AuthResponse(newAccessToken, refreshToken));
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse("Refresh 토큰이 유효하지 않습니다."));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<AuthResponse> logout(@RequestHeader("Authorization") String token) {
+        if (token != null && token.startsWith("Bearer ")) {
+            String jwt = token.substring(7);
+            tokenBlacklistService.addToBlacklist(jwt, jwtUtil.getExpirationFromToken(jwt));
+            return ResponseEntity.ok(new AuthResponse("로그아웃 되었습니다."));
+        }
+        return ResponseEntity.badRequest().body(new AuthResponse("유효하지 않은 토큰입니다."));
+    }
+
+    @Data
+    @AllArgsConstructor
+    private static class AuthResponse {
+        private String message;
+        private String accessToken;
+        private String refreshToken;
+
+        public AuthResponse(String message) {
+            this.message = message;
+        }
+
+        public AuthResponse(String accessToken, String refreshToken) {
+            this.accessToken = accessToken;
+            this.refreshToken = refreshToken;
+        }
     }
 }

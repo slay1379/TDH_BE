@@ -89,7 +89,7 @@ public class TaskService {
 
     @Transactional
     public void delayDay(Long taskId) {
-        Optional<Task> optionalTask = taskRepository.findByTaskId(taskId);
+        Optional<Task> optionalTask = taskRepository.findById(taskId);
 
         Task task = optionalTask.orElseThrow(() -> new IllegalStateException("유효하지 않은 할 일입니다."));
 
@@ -99,7 +99,7 @@ public class TaskService {
 
     @Transactional
     public void changeCompleted(Long taskId) {
-        Optional<Task> optionalTask = taskRepository.findByTaskId(taskId);
+        Optional<Task> optionalTask = taskRepository.findById(taskId);
 
         Task task = optionalTask.orElseThrow(() -> new IllegalStateException("유효하지 않은 할 일입니다."));
 
