@@ -47,6 +47,9 @@ public class User {
         if (userDto.getEmail() != null) {
             this.email = userDto.getEmail();
         }
+        if (!userDto.getPassword().equals(userDto.getComfirmPassword())) {
+            throw new IllegalStateException("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+        }
         if (userDto.getPassword() != null) {
             this.password = passwordEncoder.encode(userDto.getPassword());
         }

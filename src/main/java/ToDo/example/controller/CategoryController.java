@@ -1,5 +1,6 @@
 package ToDo.example.controller;
 
+import ToDo.example.authentication.TokenExtractor;
 import ToDo.example.domain.Category;
 import ToDo.example.service.CategoryService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,17 +18,11 @@ public class CategoryController {
 
     //새 카테고리 생성하기
     @PostMapping("/todosetting/addCategory")
-    public ResponseEntity<Category> addCategory(HttpServletRequest request, @RequestParam String categoryName) {
+    public ResponseEntity<Category> addCategory(@RequestHeader("Authorization") String token, @RequestParam String categoryName) {
 
-        String authorizationHeader = request.getHeader("Authorization");
-
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String token = authorizationHeader.substring(7);
-            Category category = categoryService.createCategory(token, categoryName);
-            return ResponseEntity.ok(category);
-        }
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        String jwt = TokenExtractor.extract(token);
+        Category category = categoryService.createCategory(token, categoryName);
+        return ResponseEntity.ok(category);
     }
 
     //카테고리 삭제

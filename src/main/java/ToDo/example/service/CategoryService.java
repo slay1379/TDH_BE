@@ -21,7 +21,6 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
-    private final GlobalExceptionHandler globalExceptionHandler;
 
     //카테고리 생성
     public Category createCategory(String token, String categoryname) {
