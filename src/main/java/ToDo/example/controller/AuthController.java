@@ -2,16 +2,15 @@ package ToDo.example.controller;
 
 import ToDo.example.DTO.UserDto;
 import ToDo.example.authentication.JwtUtil;
+import ToDo.example.authentication.TokenExtractor;
 import ToDo.example.service.AuthService;
 import ToDo.example.service.TokenBlacklistService;
-import ToDo.example.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -38,13 +37,12 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refreshToken(@RequestHeader("Authorization") String refreshToken) {
-        if (refreshToken != null && refreshToken.startsWith("Bearer ")) {
-            refreshToken = refreshToken.substring(7);
-        }
-        if (jwtUtil.validateToken(refreshToken)) {
-            String username = jwtUtil.extractUsername(refreshToken);
+
+        String refreshJwt = TokenExtractor.extract(refreshToken);
+        if (jwtUtil.validateToken(refreshJwt)) {
+            String username = jwtUtil.extractUsername(refreshJwt);
             String newAccessToken = jwtUtil.generateAccessToken(username);
-            return ResponseEntity.ok(new AuthResponse(newAccessToken, refreshToken));
+            return ResponseEntity.ok(new AuthResponse(newAccessToken, refreshJwt));
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse("Refresh 토큰이 유효하지 않습니다."));
     }

@@ -10,7 +10,6 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 
 @Component
 @EnableRedisRepositories

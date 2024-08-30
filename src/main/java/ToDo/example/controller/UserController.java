@@ -2,10 +2,8 @@ package ToDo.example.controller;
 
 import ToDo.example.DTO.UserDto;
 import ToDo.example.authentication.JwtUtil;
-import ToDo.example.domain.User;
 import ToDo.example.service.TokenBlacklistService;
 import ToDo.example.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

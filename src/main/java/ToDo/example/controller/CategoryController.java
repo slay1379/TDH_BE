@@ -3,9 +3,7 @@ package ToDo.example.controller;
 import ToDo.example.authentication.TokenExtractor;
 import ToDo.example.domain.Category;
 import ToDo.example.service.CategoryService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +19,7 @@ public class CategoryController {
     public ResponseEntity<Category> addCategory(@RequestHeader("Authorization") String token, @RequestParam String categoryName) {
 
         String jwt = TokenExtractor.extract(token);
-        Category category = categoryService.createCategory(token, categoryName);
+        Category category = categoryService.createCategory(jwt, categoryName);
         return ResponseEntity.ok(category);
     }
 

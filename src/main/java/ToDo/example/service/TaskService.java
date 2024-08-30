@@ -1,6 +1,7 @@
 package ToDo.example.service;
 
 import ToDo.example.DTO.TaskDto;
+import ToDo.example.DTO.UpdateTaskDto;
 import ToDo.example.authentication.JwtUtil;
 import ToDo.example.domain.Category;
 import ToDo.example.domain.Task;
@@ -15,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -47,31 +47,31 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    public Task updateTask(Long taskId, TaskDto taskDto) {
+    public Task updateTask(Long taskId, UpdateTaskDto updateTaskDto) {
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 할 일 입니다."));
 
-        if (taskDto.getTaskName() != null && !task.getTaskName().equals(taskDto.getTaskName())){
-            task.updateTaskName(taskDto.getTaskName());
+        if (updateTaskDto.getTaskName() != null && !task.getTaskName().equals(updateTaskDto.getTaskName())){
+            task.updateTaskName(updateTaskDto.getTaskName());
         }
 
-        if (taskDto.getCategory().getCategoryName() != null && !taskDto.getCategory().getCategoryName().isEmpty() && !task.getCategory().getCategoryName().equals(taskDto.getCategory().getCategoryName())) {
-            Category category = categoryRepository.findByCategoryName(taskDto.getCategory().getCategoryName())
+        if (updateTaskDto.getCategory().getCategoryName() != null && !updateTaskDto.getCategory().getCategoryName().isEmpty() && !task.getCategory().getCategoryName().equals(updateTaskDto.getCategory().getCategoryName())) {
+            Category category = categoryRepository.findByCategoryName(updateTaskDto.getCategory().getCategoryName())
                     .orElseThrow(() -> new IllegalStateException("존재하지 않는 카테고리입니다."));
             task.updateCategory(category);
         }
 
-        if (taskDto.getFrequency() > 0 && task.getFrequency() != taskDto.getFrequency()) {
-            task.updateFrequency(taskDto.getFrequency());
+        if (updateTaskDto.getFrequency() > 0 && task.getFrequency() != updateTaskDto.getFrequency()) {
+            task.updateFrequency(updateTaskDto.getFrequency());
         }
 
-        if (!task.getNotes().equals(taskDto.getNotes())) {
-            task.updateNotes(taskDto.getNotes());
+        if (!task.getNotes().equals(updateTaskDto.getNotes())) {
+            task.updateNotes(updateTaskDto.getNotes());
         }
 
-        if (!task.getLastDate().equals(taskDto.getLastDate())) {
-            task.updateLastDate(taskDto.getLastDate());
+        if (!task.getLastDate().equals(updateTaskDto.getLastDate())) {
+            task.updateLastDate(updateTaskDto.getLastDate());
         }
 
         return task;
