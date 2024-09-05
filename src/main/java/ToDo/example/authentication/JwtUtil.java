@@ -2,7 +2,6 @@ package ToDo.example.authentication;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -10,19 +9,23 @@ import java.util.function.Function;
 import java.security.Key;
 
 @Component
+
 public class JwtUtil {
-    @Value("${jwt.secret.key}")
     private String SECRET_KEY;
 
-    @Value("${jwt.refresh.secret.key}")
     private String REFRESH_SECRET_KEY;
 
-    @Value("${jwt.password.secret.key}")
     private String PASSWORD_RESET_SECRET_KEY;
 
     private final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 60; //1시간
     private final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24 * 7; //1주일
     private final long PASSWORD_RESET_EXPIRATION_TIME = 1000 * 60 * 5; //5분
+
+    public JwtUtil() {
+        this.SECRET_KEY = SecretKeyGenerator.generateSecretKey(32); // 32 bytes = 256 bits
+        this.REFRESH_SECRET_KEY = SecretKeyGenerator.generateSecretKey(32);
+        this.PASSWORD_RESET_SECRET_KEY = SecretKeyGenerator.generateSecretKey(32);
+    }
 
 
     public String generateAccessToken(String username) {
@@ -70,7 +73,7 @@ public class JwtUtil {
         return expiration.getTime() - System.currentTimeMillis();
     }
 
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         return Jwts.parserBuilder().setSigningKey(getSigningKey(SECRET_KEY)).build().parseClaimsJws(token).getBody();
     }
 

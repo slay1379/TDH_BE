@@ -1,10 +1,7 @@
 package ToDo.example.domain;
 
 import ToDo.example.DTO.UserDto;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,13 +10,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "users")
 @Getter
 @NoArgsConstructor
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long userId;
+    private Long id;
 
     private String username;
     private String email;
@@ -43,7 +41,7 @@ public class User {
         if (userDto.getEmail() != null) {
             this.email = userDto.getEmail();
         }
-        if (!userDto.getPassword().equals(userDto.getComfirmPassword())) {
+        if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
             throw new IllegalStateException("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
         }
         if (userDto.getPassword() != null) {

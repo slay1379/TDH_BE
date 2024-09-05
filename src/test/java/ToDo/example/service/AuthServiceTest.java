@@ -1,19 +1,24 @@
 package ToDo.example.service;
 
 import ToDo.example.DTO.UserDto;
+import ToDo.example.ToDoHousework.ToDoHouseworkApplication;
 import ToDo.example.domain.User;
 import ToDo.example.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.annotation.Commit;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = AuthServiceTest.class)
+@SpringBootTest(classes = ToDoHouseworkApplication.class)
+@Transactional
+@Commit
 public class AuthServiceTest {
 
     @Mock
@@ -22,20 +27,18 @@ public class AuthServiceTest {
     @Mock
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Mock
+    private RedisTemplate<String, Object> redisTemplate;
+
     @InjectMocks
     private AuthService authService;
-
-    @BeforeEach
-    public void setUp() {
-        // MockitoAnnotations.openMocks(this); // 이 라인은 @SpringBootTest를 사용할 때 필요하지 않습니다.
-    }
 
     @Test
     public void testRegister_Success() {
         UserDto userDto = UserDto.builder()
                 .username("slay1379")
                 .password("password")
-                .comfirmPassword("password")
+                .confirmPassword("password")
                 .email("palgalow@gmail.com")
                 .build();
 
@@ -53,7 +56,7 @@ public class AuthServiceTest {
         UserDto userDto = UserDto.builder()
                 .username("existingUser")
                 .password("password")
-                .comfirmPassword("password")
+                .confirmPassword("password")
                 .email("palgalow@gmail.com")
                 .build();
 
@@ -72,7 +75,7 @@ public class AuthServiceTest {
         UserDto userDto = UserDto.builder()
                 .username("slay1379")
                 .password("password")
-                .comfirmPassword("differentPassword")
+                .confirmPassword("differentPassword")
                 .email("palgalow@gmail.com")
                 .build();
 

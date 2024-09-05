@@ -3,11 +3,13 @@ package ToDo.example.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class TokenBlacklistService {
 
     private final RedisTemplate<String, Object> redisTemplate;

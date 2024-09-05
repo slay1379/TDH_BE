@@ -20,7 +20,7 @@ public class UserDto {
     private String password;
 
     @NotBlank(message = "필수입력 입니다.")
-    private String comfirmPassword;
+    private String confirmPassword;
 
     @Email(message = "올바른 이메일 형식이 아닙니다.")
     @NotBlank(message = "이메일은 필수입력 입니다.")

@@ -1,14 +1,14 @@
 package ToDo.example.ToDoHousework;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-class ToDoHouseworkApplicationTests {
+public class ToDoHouseworkApplicationTests {
 
 	@Test
 	void contextLoads() {
-		// This method should remain empty
+		// This test will fail if the application context cannot start
 	}
 }
