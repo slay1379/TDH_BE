@@ -32,6 +32,7 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
 	runtimeOnly 'org.postgresql:postgresql'
+	runtimeOnly 'com.h2database:h2:2.1.214'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
@@ -43,6 +44,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok:1.18.28'
 	testImplementation 'org.projectlombok:lombok:1.18.28'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
+	testImplementation 'it.ozimov:embedded-redis:0.7.2';
 }
 
 test {

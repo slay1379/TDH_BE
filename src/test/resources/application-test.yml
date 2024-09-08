@@ -1,12 +1,12 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/todohouseworkDB
+    url: jdbc:postgresql://localhost:5433/testdb
     username: postgres
     password: 1379
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
@@ -22,6 +22,7 @@ spring:
       time-to-live: 3600000
       key-prefix: "myapp::"
 
-server:
-  port: 8080
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
 

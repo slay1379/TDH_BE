@@ -1,5 +1,8 @@
 package ToDo.example.authentication;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class TokenExtractor {
     public static String extract(String bearerToken) {
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {

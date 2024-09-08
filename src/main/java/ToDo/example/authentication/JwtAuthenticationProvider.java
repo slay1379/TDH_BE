@@ -1,6 +1,8 @@
 package ToDo.example.authentication;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,9 +18,13 @@ public class JwtAuthenticationProvider {
     private final UserDetailsService userDetailsService;
 
     public Authentication getAuthentication(String token) {
-        Claims claims = jwtUtil.extractAllClaims(token);
-        String username = claims.getSubject();
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        try {
+            Claims claims = jwtUtil.extractAllClaims(token);
+            String username = claims.getSubject();
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        } catch (ExpiredJwtException | MalformedJwtException e) {
+            throw new IllegalStateException("유효하지 않은 토큰입니다.", e);
+        }
     }
 }
