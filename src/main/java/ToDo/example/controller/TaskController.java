@@ -2,6 +2,7 @@ package ToDo.example.controller;
 
 import ToDo.example.DTO.TaskDto;
 import ToDo.example.DTO.UpdateTaskDto;
+import ToDo.example.authentication.TokenExtractor;
 import ToDo.example.domain.Task;
 import ToDo.example.service.TaskService;
 import jakarta.validation.Valid;
@@ -28,8 +29,9 @@ public class TaskController {
     public ResponseEntity<Task> createTask(@Valid @RequestBody TaskDto taskDto,
                                            @RequestHeader("Authorization") String token) {
 
-        Task task = taskService.createTask(taskDto, token);
-        return new ResponseEntity<>(task, HttpStatus.CREATED);
+        String jwt = TokenExtractor.extract(token);
+        Task task = taskService.createTask(taskDto, jwt);
+        return ResponseEntity.status(HttpStatus.CREATED).body(task);
     }
 
     //할 일 수정

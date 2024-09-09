@@ -37,24 +37,20 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refreshToken(@RequestHeader("Authorization") String refreshToken) {
-
-        String refreshJwt = TokenExtractor.extract(refreshToken);
-        if (jwtUtil.validateToken(refreshJwt)) {
-            String username = jwtUtil.extractUsername(refreshJwt);
+        String jwt = TokenExtractor.extract(refreshToken);
+        if (jwtUtil.validateToken(jwt)) {
+            String username = jwtUtil.extractUsername(jwt);
             String newAccessToken = jwtUtil.generateAccessToken(username);
-            return ResponseEntity.ok(new AuthResponse(newAccessToken, refreshJwt));
+            return ResponseEntity.ok(new AuthResponse(newAccessToken, jwt));
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse("Refresh 토큰이 유효하지 않습니다."));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<AuthResponse> logout(@RequestHeader("Authorization") String token) {
-        if (token != null && token.startsWith("Bearer ")) {
-            String jwt = token.substring(7);
-            tokenBlacklistService.addToBlacklist(jwt, jwtUtil.getExpirationFromToken(jwt));
-            return ResponseEntity.ok(new AuthResponse("로그아웃 되었습니다."));
-        }
-        return ResponseEntity.badRequest().body(new AuthResponse("유효하지 않은 토큰입니다."));
+        String jwt = TokenExtractor.extract(token);
+        tokenBlacklistService.addToBlacklist(jwt, jwtUtil.getExpirationFromToken(jwt));
+        return ResponseEntity.ok(new AuthResponse("로그아웃 되었습니다."));
     }
 
     @Data
