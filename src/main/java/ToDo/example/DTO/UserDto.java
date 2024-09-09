@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
 public class UserDto {
 
     @NotBlank(message = "아이디는 필수입력 입니다.")

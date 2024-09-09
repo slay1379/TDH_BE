@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
-    List<Task> findByUser_Id(Long userId);
+    List<Task> findByUserId(Long userId);
 
     List<Task> findByLastDate(LocalDate lastDate);
 

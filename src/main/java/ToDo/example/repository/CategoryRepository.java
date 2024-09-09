@@ -14,5 +14,4 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     List<Category> findAllByCategoryName(String categoryName);
 
-    boolean existsByCategoryId(Long categoryId);
 }
