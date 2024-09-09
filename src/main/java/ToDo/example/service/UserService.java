@@ -25,9 +25,7 @@ public class UserService {
 
     //회원정보수정
     public void updateUser(UserDto userDto, String token) {
-        if (jwtUtil.isTokenExpired(token)) {
-            throw new IllegalStateException("토큰이 만료되었습니다. 다시 로그인 해주세요.");
-        }
+        validateToken(token);
 
         String username = jwtUtil.extractUsername(token);
         User user = userRepository.findByUsername(username)
@@ -44,18 +42,12 @@ public class UserService {
         String token = jwtUtil.generatePasswordResetToken(user.getEmail());
         String resetLink = "http://나의도메인.com/reset-password?token=" + token;
 
-        try {
-            emailService.sendPasswordResetEmail(user.getEmail(), resetLink);
-        } catch (MessagingException e) {
-            throw new IllegalStateException("이메일 전송에 실패하였습니다.", e);
-        }
+        emailService.sendPasswordResetEmail(user.getEmail(), resetLink);
     }
 
     //비밀번호 재설정
     public void resetPassword(String token, String newPassword) {
-        if (jwtUtil.isTokenExpired(token)) {
-            throw new IllegalStateException("비밀번호 재설정 토큰이 만료되었습니다.");
-        }
+        validateToken(token);
 
         String email = jwtUtil.extractEmail(token);
         User user = userRepository.findByEmail(email)
@@ -63,6 +55,12 @@ public class UserService {
 
         user.updatePassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
+
+    private void validateToken(String token) {
+        if (jwtUtil.isTokenExpired(token)) {
+            throw new IllegalStateException("토큰이 만료되었습니다. 다시 로그인 해주세요.");
+        }
     }
 
 }

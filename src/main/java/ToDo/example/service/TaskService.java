@@ -29,10 +29,7 @@ public class TaskService {
 
     //할 일 생성
     public Task createTask(TaskDto taskDto, String token) {
-        if (jwtUtil.isTokenExpired(token)) {
-            throw new IllegalStateException("토큰이 만료되었습니다 다시 로그인 해주세요.");
-        }
-        String username = jwtUtil.extractUsername(token);
+        String username = getValidateUsername(token);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("유효하지 않은 사용자입니다."));
 
@@ -113,5 +110,11 @@ public class TaskService {
                 .orElseThrow(() -> new IllegalStateException("유효하지 않은 할 일입니다."));
     }
 
+    private String getValidateUsername(String token) {
+        if (jwtUtil.isTokenExpired(token)) {
+            throw new IllegalStateException("토큰이 만료되었습니다. 다시 로그인 해주세요.");
+        }
+        return jwtUtil.extractUsername(token);
+    }
 
 }

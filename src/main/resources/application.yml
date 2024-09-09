@@ -22,6 +22,18 @@ spring:
       time-to-live: 3600000
       key-prefix: "myapp::"
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: palgalow@gmail.com
+    password: slay01379
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 server:
   port: 8080
 

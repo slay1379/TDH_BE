@@ -16,7 +16,7 @@ public class UpdateTaskDto {
     private String taskName;
 
     @NotBlank(message = "카테고리를 선택해주세요.")
-    private Long categoryId;
+    private Category category;
 
     @Min(value = 1, message = "주기 입력은 필수입니다.")
     private int frequency;

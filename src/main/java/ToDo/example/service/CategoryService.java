@@ -22,7 +22,7 @@ public class CategoryService {
 
     //카테고리 생성
     public Category createCategory(String token, String categoryname) {
-        String username = jwtUtil.extractUsername(token);
+        String username = getValidateUsername(token);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("유효하지 않는 사용자입니다."));
 
@@ -36,5 +36,12 @@ public class CategoryService {
         categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 카테고리입니다."));
         categoryRepository.deleteById(categoryId);
+    }
+
+    private String getValidateUsername(String token) {
+        if (jwtUtil.isTokenExpired(token)) {
+            throw new IllegalStateException("토큰이 만료되었습니다. 다시 로그인 해주세요.");
+        }
+        return jwtUtil.extractUsername(token);
     }
 }

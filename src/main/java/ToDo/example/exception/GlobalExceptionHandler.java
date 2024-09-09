@@ -21,26 +21,30 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserNotFound(UsernameNotFoundException ex) {
         logger.error("User not found: " + ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("사용자를 찾을 수 없습니다", ex.getMessage()));
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다", ex.getMessage());
     }
 
     //인증 실패 예외 처리
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("인증에 실패하였습니다", ex.getMessage()));
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED,"인증에 실패하였습니다", ex.getMessage());
     }
 
     //토큰 예외 처리
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<ErrorResponse> handleJwtException(JwtException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("토큰이 유효하지 않습니다", ex.getMessage()));
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED,"토큰이 유효하지 않습니다", ex.getMessage());
     }
 
     //모든 일반적인 예외 처리
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex){
         logger.error("예상치 못한 오류 발생", ex);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("예상치 못한 오류", ex.getMessage()));
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,"예상치 못한 오류", ex.getMessage());
+    }
+
+    private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String error, String message) {
+        return ResponseEntity.status(status).body(new ErrorResponse(error, message));
     }
 
     @Data
