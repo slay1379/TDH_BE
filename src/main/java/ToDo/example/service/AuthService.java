@@ -2,7 +2,7 @@ package ToDo.example.service;
 
 import ToDo.example.DTO.UserDto;
 import ToDo.example.authentication.JwtUtil;
-import ToDo.example.domain.User;
+import ToDo.example.domain.Users;
 import ToDo.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,23 +25,23 @@ public class AuthService {
         validateUserExists(userDto.getUsername());
         validatePasswordMatch(userDto.getPassword(), userDto.getConfirmPassword());
 
-        User user = User.builder()
+        Users users = Users.builder()
                 .username(userDto.getUsername())
                 .email(userDto.getEmail())
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .build();
 
-        userRepository.save(user);
+        userRepository.save(users);
     }
 
     //로그인
     public String login(UserDto userDto) {
-        User user = userRepository.findByUsername(userDto.getUsername())
+        Users users = userRepository.findByUsername(userDto.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 아이디입니다."));
 
-        validatePassword(userDto.getPassword(), user.getPassword());
+        validatePassword(userDto.getPassword(), users.getPassword());
 
-        return jwtUtil.generateAccessToken(user.getUsername());
+        return jwtUtil.generateAccessToken(users.getUsername());
     }
 
     //사용자 유효성 검사

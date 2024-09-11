@@ -2,7 +2,7 @@ package ToDo.example.service;
 
 import ToDo.example.authentication.JwtUtil;
 import ToDo.example.domain.Category;
-import ToDo.example.domain.User;
+import ToDo.example.domain.Users;
 import ToDo.example.repository.CategoryRepository;
 import ToDo.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +23,10 @@ public class CategoryService {
     //카테고리 생성
     public Category createCategory(String token, String categoryname) {
         String username = getValidateUsername(token);
-        User user = userRepository.findByUsername(username)
+        Users users = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("유효하지 않는 사용자입니다."));
 
-        Category category = new Category(user, categoryname);
+        Category category = new Category(users, categoryname);
 
         return categoryRepository.save(category);
     }

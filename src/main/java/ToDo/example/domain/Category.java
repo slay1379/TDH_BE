@@ -17,13 +17,13 @@ public class Category {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private Users user;
 
     @NotBlank(message = "이름을 입력해주세요.")
     private String categoryName;
 
     @Builder
-    public Category(User user, String categoryName) {
+    public Category(Users user, String categoryName) {
         this.user = user;
         this.categoryName = categoryName;
     }

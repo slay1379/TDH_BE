@@ -5,7 +5,7 @@ import ToDo.example.DTO.UpdateTaskDto;
 import ToDo.example.authentication.JwtUtil;
 import ToDo.example.domain.Category;
 import ToDo.example.domain.Task;
-import ToDo.example.domain.User;
+import ToDo.example.domain.Users;
 import ToDo.example.repository.CategoryRepository;
 import ToDo.example.repository.TaskRepository;
 import ToDo.example.repository.UserRepository;
@@ -30,12 +30,12 @@ public class TaskService {
     //할 일 생성
     public Task createTask(TaskDto taskDto, String token) {
         String username = getValidateUsername(token);
-        User user = userRepository.findByUsername(username)
+        Users users = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("유효하지 않은 사용자입니다."));
 
         Task task = Task.builder()
                 .taskName(taskDto.getTaskName())
-                .user(user)
+                .user(users)
                 .frequency(taskDto.getFrequency())
                 .category(taskDto.getCategory())
                 .notes(taskDto.getNotes())

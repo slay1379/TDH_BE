@@ -8,8 +8,10 @@ import ToDo.example.service.TokenBlacklistService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +27,9 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody UserDto userDto) {
         authService.register(userDto);
-        return ResponseEntity.ok(new AuthResponse("회원가입에 성공했습니다."));
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new AuthResponse("회원가입에 성공했습니다."));
     }
 
     @PostMapping("/login")
@@ -54,8 +58,9 @@ public class AuthController {
     }
 
     @Data
+    @NoArgsConstructor
     @AllArgsConstructor
-    private static class AuthResponse {
+    public class AuthResponse {
         private String message;
         private String accessToken;
         private String refreshToken;

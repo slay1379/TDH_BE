@@ -2,9 +2,8 @@ package ToDo.example.service;
 
 import ToDo.example.DTO.UserDto;
 import ToDo.example.authentication.JwtUtil;
-import ToDo.example.domain.User;
+import ToDo.example.domain.Users;
 import ToDo.example.repository.UserRepository;
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,21 +27,21 @@ public class UserService {
         validateToken(token);
 
         String username = jwtUtil.extractUsername(token);
-        User user = userRepository.findByUsername(username)
+        Users users = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("유효하지 않은 사용자입니다."));
 
-        user.update(userDto, passwordEncoder);
+        users.update(userDto, passwordEncoder);
     }
 
     //비밀번호 재설정 링크 이메일로 보내기
     public void sendPasswordResetLink(String email) {
-        User user = userRepository.findByEmail(email)
+        Users users = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("유효하지 않은 사용자입니다."));
 
-        String token = jwtUtil.generatePasswordResetToken(user.getEmail());
+        String token = jwtUtil.generatePasswordResetToken(users.getEmail());
         String resetLink = "http://나의도메인.com/reset-password?token=" + token;
 
-        emailService.sendPasswordResetEmail(user.getEmail(), resetLink);
+        emailService.sendPasswordResetEmail(users.getEmail(), resetLink);
     }
 
     //비밀번호 재설정
@@ -50,11 +49,11 @@ public class UserService {
         validateToken(token);
 
         String email = jwtUtil.extractEmail(token);
-        User user = userRepository.findByEmail(email)
+        Users users = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("유효하지 않은 사용자입니다."));
 
-        user.updatePassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
+        users.updatePassword(passwordEncoder.encode(newPassword));
+        userRepository.save(users);
     }
 
     private void validateToken(String token) {

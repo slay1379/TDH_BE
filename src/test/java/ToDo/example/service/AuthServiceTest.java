@@ -2,62 +2,75 @@ package ToDo.example.service;
 
 import ToDo.example.DTO.UserDto;
 import ToDo.example.ToDoHousework.ToDoHouseworkApplication;
-import ToDo.example.domain.User;
+import ToDo.example.domain.Users;
 import ToDo.example.repository.UserRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Optional;
 
-@SpringBootTest(classes = ToDoHouseworkApplication.class)
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 @ActiveProfiles("test")
+@SpringBootTest(classes = ToDoHouseworkApplication.class)
 @Transactional
 public class AuthServiceTest {
 
     @Autowired
-    private AuthService authService;
-
-    @Autowired
     private UserRepository userRepository;
 
-    private UserDto testUserDto;
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
+    @Autowired
+    private AuthService authService;
+
+    private UserDto testUserDto;
+    private Users testUser;
 
     @BeforeEach
-    void setup() {
+    public void setUp() {
         testUserDto = UserDto.builder()
                 .username("testuser")
-                .password("testpassword")
-                .confirmPassword("testpassword")
-                .email("test@example.com")
+                .password("testpass")
+                .confirmPassword("testpass")
+                .email("testuser@example.com")
+                .build();
+
+        testUser = Users.builder()
+                .username("testuser")
+                .password("hashedpassword")
+                .email("testuser@example.com")
                 .build();
     }
 
-    @AfterEach
-    void tearDown() {
-        userRepository.deleteAll();
-    }
-
-
     @Test
+    @Rollback(false)
     public void testRegister_Success() {
-
+        //when
         authService.register(testUserDto);
 
-        User savedUser = userRepository.findByUsername(testUserDto.getUsername())
+        //then
+        Users savedUser = userRepository.findByUsername(testUserDto.getUsername())
                 .orElseThrow(() -> new AssertionError("사용자를 찾을 수 없습니다."));
 
         assertNotNull(savedUser);
         assertEquals(testUserDto.getUsername(), savedUser.getUsername());
         assertEquals(testUserDto.getEmail(), savedUser.getEmail());
-        assertNotEquals(testUserDto.getPassword(), savedUser.getPassword());
+        assertTrue(passwordEncoder.matches(testUserDto.getPassword(), savedUser.getPassword()));
     }
+
+
 }

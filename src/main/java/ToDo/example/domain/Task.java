@@ -19,7 +19,7 @@ public class Task {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private Users user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -35,7 +35,7 @@ public class Task {
     private String notes;
 
     @Builder
-    public Task(String taskName, Category category, int frequency, String notes, User user) {
+    public Task(String taskName, Category category, int frequency, String notes, Users user) {
         this.taskName = taskName;
         this.category = category;
         this.frequency = frequency;
